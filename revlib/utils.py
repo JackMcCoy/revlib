@@ -121,6 +121,7 @@ def module_list_to_momentum_net(module: torch.nn.ModuleList,
                                 target_device: str = "",
                                 residual: bool = False,
                                 beta: float = 0.9) -> torch.nn.ModuleList:
+    """Wraps modules in individual MomentumNets."""
     net = momentum_net(*maybe_residual_to_plain(module, residual), split_dim=0, coupling_forward=coupling_forward,
                        coupling_inverse=coupling_inverse, memory_mode=memory_mode, target_device=target_device,
                        beta=beta)

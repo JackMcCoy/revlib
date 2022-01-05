@@ -169,12 +169,18 @@ class ReversibleModuleCache:
 
 
 class ReversibleModule(torch.nn.Module):
+    """Overrides default node overhead by recomputing states."""
     cpu_state: torch.Tensor
     cuda_states: typing.List[torch.Tensor]
 
     def __init__(self, wrapped_module: torch.nn.Module, coupling_forward: typing.Optional[COUPLING] = None,
                  coupling_inverse: typing.Optional[COUPLING] = None, memory_savings: bool = True,
                  cache: typing.Optional[ReversibleModuleCache] = None, target_device: str = ""):
+        """Defines variables for replaying wrapped reversible-module.
+
+        Arguments:
+            wrapped_module (torch.nn.Module): Module capable of producing
+        """
         super(ReversibleModule, self).__init__()
         self.wrapped_module = ReversibleWrapper(wrapped_module, coupling_forward, coupling_inverse)
         self.target_device = target_device
@@ -263,6 +269,7 @@ class ReversibleModule(torch.nn.Module):
 
 
 class SingleBranchReversibleModule(ReversibleModule):
+    """Extends ReversibleModule"""
     def __init__(self, secondary_branch_buffer: typing.List[torch.Tensor], wrapped_module: torch.nn.Module,
                  coupling_forward: typing.Optional[COUPLING] = None,
                  coupling_inverse: typing.Optional[COUPLING] = None, memory_savings: bool = True,
