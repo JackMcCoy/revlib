@@ -360,6 +360,7 @@ class ReversibleSequential(torch.nn.Module):
     def forward(self, inp: torch.Tensor, *args) -> torch.Tensor:
         print('revsequential forward')
         print(type(inp))
+        print(inp.shape)
         if not type(inp) == torch.Tensor:
             [print(type(i)) for i in inp]
 
