@@ -72,7 +72,7 @@ class _ReversibleHalfResidualSwapFn(torch.autograd.Function):
     @staticmethod
     def forward(*args):
         print(len(args))
-        print(type(i) for i in args)
+        [print(type(i) for i in args]
         ctx.mod = mod
         ctx.target_device = target_device
         ctx.forward_rng_state = torch.get_rng_state()
