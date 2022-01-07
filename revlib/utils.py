@@ -11,7 +11,7 @@ class MomentumNetSide(torch.nn.Module):
         self.beta = beta
 
     def forward(self, inp: torch.Tensor, *args, **kwargs) -> torch.Tensor:
-        return inp[0] * self.beta, inp[1:]
+        return inp * self.beta
 
 
 class MomentumNetStem(torch.nn.Module):
