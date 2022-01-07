@@ -236,7 +236,7 @@ class ReversibleModule(torch.nn.Module):
         self.input_args = args
         self.input_kwargs = kwargs
 
-        x0, x1, *back = inp
+        x0, x1, back0,back1 = inp
         self.cpu_state = torch.get_rng_state()
         if self.cuda:
             self.cuda_devices, self.cuda_states = torch.utils.checkpoint.get_device_states(*inp)
@@ -245,7 +245,7 @@ class ReversibleModule(torch.nn.Module):
             return x1, self.wrapped_module(x0, x1, *args, **kwargs)
 
         if self.cache is None:
-            x0, x1, y0, y1, res = reverse_and_swap(x0, x1, *back, self.wrapped_module, self.target_device, self.cuda,
+            x0, x1, y0, y1, res = reverse_and_swap(x0, x1, back0, back1, self.wrapped_module, self.target_device, self.cuda,
                                                    args, kwargs)
             if res is not None:
                 x1 = [x1] + res
@@ -352,7 +352,7 @@ class ReversibleSequential(torch.nn.Module):
         self.split_dim = split_dim
         self.m = memory_mode
 
-    def forward(self, inp: torch.Tensor) -> torch.Tensor:
+    def forward(self, inp: torch.Tensor, *args) -> torch.Tensor:
         inp0, inp1 = inp.chunk(2, self.split_dim)
         zeros = torch.zeros_like(inp0)
-        return torch.cat(self.replace_grad(*self.stem((inp0, inp1, zeros, zeros))), dim=self.split_dim)
+        return torch.cat(self.replace_grad(*self.stem((inp0, inp1, zeros, zeros, *args))), dim=self.split_dim)
