@@ -17,7 +17,7 @@ class MomentumNetSide(torch.nn.Module):
             print('momentumnet side')
             print(len(inp))
             [print(type(i)) for i in inp]
-            return inp[0] * self.beta, inp[1], inp[2]
+            return inp[0] * self.beta
 
 
 class MomentumNetStem(torch.nn.Module):
