@@ -236,7 +236,12 @@ class ReversibleModule(torch.nn.Module):
         self.input_args = args
         self.input_kwargs = kwargs
 
-        x0, x1, back0,back1 = inp
+        x0, x1, *back = inp
+        if len(back)==3:
+            args = [back[2]]+args
+        elif len(back)>3:
+            args = back[2:]+args
+
         self.cpu_state = torch.get_rng_state()
         if self.cuda:
             self.cuda_devices, self.cuda_states = torch.utils.checkpoint.get_device_states(*inp)
@@ -245,7 +250,7 @@ class ReversibleModule(torch.nn.Module):
             return x1, self.wrapped_module(x0, x1, *args, **kwargs)
 
         if self.cache is None:
-            x0, x1, y0, y1, res = reverse_and_swap(x0, x1, back0, back1, self.wrapped_module, self.target_device, self.cuda,
+            x0, x1, y0, y1, res = reverse_and_swap(x0, x1, back, self.wrapped_module, self.target_device, self.cuda,
                                                    args, kwargs)
             if res is not None:
                 x1 = [x1] + res
