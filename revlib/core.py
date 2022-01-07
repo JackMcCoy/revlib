@@ -255,9 +255,8 @@ class ReversibleModule(torch.nn.Module):
         if self.cache is None:
             x0, x1, y0, y1, res = reverse_and_swap(x0, x1, *back, self.wrapped_module, self.target_device, self.cuda,
                                                    args, kwargs)
-            if res is not None:
-                x1 = [x1] + res
-            return x0, x1, y0, y1
+
+            return x0, x1, y0, y1, res
 
         self.counter = 0
         self.storage = {}
@@ -369,4 +368,5 @@ class ReversibleSequential(torch.nn.Module):
 
         inp0, inp1 = inp.chunk(2, self.split_dim)
         zeros = torch.zeros_like(inp0)
-        return torch.cat(self.replace_grad(*self.stem((inp0, inp1, zeros, zeros, *args))), dim=self.split_dim)
+        x0, x1, z0, z1, a = self.replace_grad(*self.stem((inp0, inp1, zeros, zeros, *args)))
+        return torch.cat([x0, x1, z0, z1], dim=self.split_dim), a
