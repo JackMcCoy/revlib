@@ -14,6 +14,8 @@ class MomentumNetSide(torch.nn.Module):
         if type(inp)==torch.Tensor:
             return inp * self.beta
         else:
+            print(len(inp))
+            [print(type(i)) for i in inp]
             return inp[0] * self.beta, inp[1], inp[2]
 
 
