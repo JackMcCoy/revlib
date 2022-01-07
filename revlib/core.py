@@ -21,7 +21,7 @@ class MemoryModes(enum.IntEnum):
 class _ReplaceGrad(torch.autograd.Function):
     @staticmethod
     def forward(ctx, inp0: torch.Tensor, inp1: torch.Tensor, tmp_inp0: torch.Tensor, tmp_inp1: torch.Tensor):
-        ctx.save_for_backward(inp0.detach(), inp1.detach())
+        ctx.save_for_backward(inp0[0].detach(), inp1.detach())
         return inp0, inp1
 
     @staticmethod
