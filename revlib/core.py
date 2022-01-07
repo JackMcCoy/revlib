@@ -153,14 +153,14 @@ def additive_coupling_forward(other_stream: torch.Tensor, fn_out: torch.Tensor) 
     print('additive_coupleing_forward')
     print(len(fn_out))
     [print(type(i)) for i in fn_out]
-    return [other_stream + fn_out[0]] + fn_out[1]
+    return [other_stream + fn_out[0]], *fn_out[1]
 
 
 def additive_coupling_inverse(output: torch.Tensor, fn_out: torch.Tensor) -> TENSOR_OR_LIST:
     fn_out = split_tensor_list(fn_out)
     if isinstance(fn_out, torch.Tensor):
         return output - fn_out
-    return [output - fn_out[0]] + fn_out[1]
+    return [output - fn_out[0]], *fn_out[1]
 
 
 class ReversibleModuleCache:
