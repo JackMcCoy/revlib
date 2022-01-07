@@ -70,9 +70,10 @@ class ReversibleWrapper(torch.nn.Module):
 
 class _ReversibleHalfResidualSwapFn(torch.autograd.Function):
     @staticmethod
-    def forward(*args):
-        print(len(args))
-        [print(type(i)) for i in args]
+    def forward(ctx, x0: torch.Tensor, x1: torch.Tensor, back_x0: torch.Tensor, back_x1: torch.Tensor,
+                mod: ReversibleWrapper, target_device: str, cuda: bool, args: typing.Iterable, kwargs: dict):
+        #print(len(args))
+        #[print(type(i)) for i in args]
         ctx.mod = mod
         ctx.target_device = target_device
         ctx.forward_rng_state = torch.get_rng_state()
@@ -250,7 +251,7 @@ class ReversibleModule(torch.nn.Module):
             return x1, self.wrapped_module(x0, x1, *args, **kwargs)
 
         if self.cache is None:
-            x0, x1, y0, y1, res = reverse_and_swap(x0, x1, back, self.wrapped_module, self.target_device, self.cuda,
+            x0, x1, y0, y1, res = reverse_and_swap(x0, x1, *back, self.wrapped_module, self.target_device, self.cuda,
                                                    args, kwargs)
             if res is not None:
                 x1 = [x1] + res
