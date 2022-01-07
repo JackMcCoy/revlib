@@ -361,6 +361,10 @@ class ReversibleSequential(torch.nn.Module):
         self.m = memory_mode
 
     def forward(self, inp: torch.Tensor, *args) -> torch.Tensor:
+        print('revsequential forward')
+        print(type(inp))
+        if not type(inp) == torch.Tensor:
+            [print(type(i)) for i in inp]
         inp0, inp1 = inp.chunk(2, self.split_dim)
         zeros = torch.zeros_like(inp0)
         return torch.cat(self.replace_grad(*self.stem((inp0, inp1, zeros, zeros, *args))), dim=self.split_dim)
