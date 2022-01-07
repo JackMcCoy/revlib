@@ -70,8 +70,9 @@ class ReversibleWrapper(torch.nn.Module):
 
 class _ReversibleHalfResidualSwapFn(torch.autograd.Function):
     @staticmethod
-    def forward(ctx, x0: torch.Tensor, x1: torch.Tensor, back_x0: torch.Tensor, back_x1: torch.Tensor,
-                mod: ReversibleWrapper, target_device: str, cuda: bool, args: typing.Iterable, kwargs: dict):
+    def forward(*args):
+        print(len(args))
+        print(type(i) for i in args)
         ctx.mod = mod
         ctx.target_device = target_device
         ctx.forward_rng_state = torch.get_rng_state()
