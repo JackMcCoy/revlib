@@ -38,6 +38,8 @@ def _set_device(mod: torch.nn.Module, device: str) -> torch.nn.Module:
 
 def split_tensor_list(inp: typing.Union[typing.Iterable[torch.Tensor], torch.Tensor]
                       ) -> typing.Union[typing.Tuple[torch.Tensor, typing.List[torch.Tensor]], torch.Tensor]:
+    print(len(inp))
+    [print(type(i)) for i in inp]
     if isinstance(inp, torch.Tensor):
         return inp
     if isinstance(inp, typing.Iterable):
