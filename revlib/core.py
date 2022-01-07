@@ -237,10 +237,8 @@ class ReversibleModule(torch.nn.Module):
         self.input_kwargs = kwargs
 
         x0, x1, *back = inp
-        if len(back)==3:
-            args = [back[2]]+args
-        elif len(back)>3:
-            args = back[2:]+args
+        if len(back)>2:
+            args = tuple(back[2:])+args
 
         self.cpu_state = torch.get_rng_state()
         if self.cuda:
