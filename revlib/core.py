@@ -20,9 +20,9 @@ class MemoryModes(enum.IntEnum):
 
 class _ReplaceGrad(torch.autograd.Function):
     @staticmethod
-    def forward(ctx, inp0: torch.Tensor, inp1: torch.Tensor, tmp_inp0: torch.Tensor, tmp_inp1: torch.Tensor):
+    def forward(ctx, inp0: torch.Tensor, inp1: torch.Tensor, tmp_inp0: torch.Tensor, tmp_inp1: torch.Tensor, args):
         ctx.save_for_backward(inp0.detach(), inp1.detach())
-        return inp0, inp1
+        return inp0, inp1, args
 
     @staticmethod
     def backward(ctx, grad0: torch.Tensor, grad1: torch.Tensor):
