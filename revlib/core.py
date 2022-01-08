@@ -20,9 +20,9 @@ class MemoryModes(enum.IntEnum):
 
 class _ReplaceGrad(torch.autograd.Function):
     @staticmethod
-    def forward(ctx, inp0: torch.Tensor, inp1: torch.Tensor, tmp_inp0: torch.Tensor, tmp_inp1: torch.Tensor, args):
+    def forward(ctx, inp0: torch.Tensor, inp1: torch.Tensor, tmp_inp0: torch.Tensor, tmp_inp1: torch.Tensor):
         ctx.save_for_backward(inp0[0].detach(), inp1[0].detach())
-        return inp0, inp1, args
+        return inp0, inp1
 
     @staticmethod
     def backward(ctx, grad0: torch.Tensor, grad1: torch.Tensor):
@@ -368,6 +368,4 @@ class ReversibleSequential(torch.nn.Module):
 
         inp0, inp1 = inp.chunk(2, self.split_dim)
         zeros = torch.zeros_like(inp0)
-        s = self.stem((inp0, inp1, zeros, zeros, *args))
-        x0, x1, a = self.replace_grad(*s)
-        return torch.cat([x0, x1], dim=self.split_dim), a
+        return torch.cat(self.replace_grad(*self.stem((inp0, inp1, zeros, zeros))), dim=self.split_dim), args
