@@ -369,5 +369,5 @@ class ReversibleSequential(torch.nn.Module):
         inp0, inp1 = inp.chunk(2, self.split_dim)
         zeros = torch.zeros_like(inp0)
         x, ci, style = self.stem((inp0, inp1, zeros, zeros), *args)
-        x = torch.cat(self.replace_grad(*x, dim=self.split_dim)
+        x = torch.cat(self.replace_grad(*x, dim=self.split_dim))
         return x, ci, style
