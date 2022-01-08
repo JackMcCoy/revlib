@@ -27,7 +27,8 @@ class MomentumNetStem(torch.nn.Module):
         self.beta = beta
 
     def forward(self, inp: torch.Tensor, *args, **kwargs) -> torch.Tensor:
-        print(type(inp))
+        print('momentumnetstem')
+        print(type(args))
         if type(inp) != torch.Tensor:
             return self.wrapped_module(inp[0] * self.beta, inp[1], inp[2], *args, **kwargs)
         return self.wrapped_module(inp * self.beta, *args, **kwargs)
