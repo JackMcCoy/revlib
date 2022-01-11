@@ -364,14 +364,9 @@ class ReversibleSequential(torch.nn.Module):
                 **kwargs) -> torch.Tensor:
         inp0, inp1 = inp.chunk(2, self.split_dim)
         zeros = torch.zeros_like(inp0)
-        if layerwise_args_kwargs is not None:
-            args = [list(args) + arg[0] for arg in args]
-            kwargs = [{**kwargs, **arg[1]} for arg in args]
         if not args:
-            args = [[]] * len(self.stem)
-        if not kwargs:
-            kwargs = [{}] * len(self.stem)
+            args = [[]]
         out = inp0, inp1, zeros, zeros
-        for mod, arg, kwarg in zip(self.stem, args, kwargs):
-            out = mod(out, *arg, **kwarg)
+        for mod in self.stem:
+            out = mod(out, *args)
         return torch.cat(self.replace_grad(*out), dim=self.split_dim)
