@@ -346,29 +346,29 @@ class ReversibleSequential(torch.nn.Module):
         memory_savings = memory_mode != MemoryModes.no_savings
         cache = ReversibleModuleCache() if memory_mode in (MemoryModes.checkpoint, MemoryModes.autograd_graph) else None
         self.replace_grad = replace_grad if memory_mode == MemoryModes.autograd_function else lambda *x: x
-        self.stem = torch.nn.Sequential(*[m if isinstance(m, ReversibleModule) else
-                                          ReversibleModule(m,
-                                                           coupling_forward[i % len(coupling_forward)],
-                                                           coupling_inverse[i % len(coupling_inverse)],
-                                                           memory_savings,
-                                                           copy.deepcopy(cache) if memory_mode == MemoryModes.checkpoint
-                                                           else cache,
-                                                           target_device
-                                                           )
-                                          for i, m in enumerate(modules)])
+        self.stem = torch.nn.ModuleList([m if isinstance(m, ReversibleModule) else
+                                         ReversibleModule(m,
+                                                          coupling_forward[i % len(coupling_forward)],
+                                                          coupling_inverse[i % len(coupling_inverse)],
+                                                          memory_savings,
+                                                          copy.deepcopy(cache) if memory_mode == MemoryModes.checkpoint
+                                                          else cache,
+                                                          target_device
+                                                          )
+                                         for i, m in enumerate(modules)])
         self.split_dim = split_dim
         self.m = memory_mode
 
-    def forward(self, inp: torch.Tensor, *args) -> torch.Tensor:
-        print('revsequential forward')
-        print(type(inp))
-        print(inp.shape)
-        if not type(inp) == torch.Tensor:
-            [print(type(i)) for i in inp]
-
+    def forward(self, inp: torch.Tensor, *args,
+                layerwise_args_kwargs: typing.Optional[
+                    typing.List[typing.Tuple[typing.List[typing.Any], typing.Dict[str, typing.Any]]]] = None,
+                **kwargs) -> torch.Tensor:
         inp0, inp1 = inp.chunk(2, self.split_dim)
         zeros = torch.zeros_like(inp0)
-        x0,x1,z0,z1,a = self.stem((inp0, inp1, zeros, zeros,*args))
-
-        x = torch.cat(self.replace_grad(x0[0],x1,z0,z1), dim=self.split_dim)
-        return x, a
+        if layerwise_args_kwargs is not None:
+            args = [list(args) + arg[0] for arg in args]
+            kwargs = [{**kwargs, **arg[1]} for arg in args]
+        out = inp0, inp1, zeros, zeros
+        for mod in self.stem:
+            out = mod(out, *args, **kwargs)
+        return torch.cat(self.replace_grad(*out), dim=self.split_dim)
