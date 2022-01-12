@@ -20,7 +20,7 @@ class MemoryModes(enum.IntEnum):
 
 class _ReplaceGrad(torch.autograd.Function):
     @staticmethod
-    def forward(ctx, inp0: torch.Tensor, inp1: torch.Tensor, tmp_inp0: torch.Tensor, tmp_inp1: torch.Tensor):
+    def forward(ctx, inp0: torch.Tensor, inp1: torch.Tensor, tmp_inp0: torch.Tensor, tmp_inp1: torch.Tensor, *args):
         ctx.save_for_backward(inp0[0].detach(), inp1[0].detach())
         return inp0, inp1
 
@@ -61,10 +61,10 @@ class ReversibleWrapper(torch.nn.Module):
         self.coupling_inverse = coupling_inverse or additive_coupling_inverse
 
     def forward(self, x0: torch.Tensor, x1: torch.Tensor, *args, **kwargs) -> TENSOR_OR_LIST:
-        return self.coupling_forward(x0, self.wrapped_module(x1, *args))
+        return self.coupling_forward(x0, self.wrapped_module(x1, *args, **kwargs))
 
     def inverse(self, y0: torch.Tensor, y1: torch.Tensor, *args, **kwargs) -> TENSOR_OR_LIST:
-        return self.coupling_inverse(y1, self.wrapped_module(y0, *args))
+        return self.coupling_inverse(y1, self.wrapped_module(y0, *args, **kwargs))
 
 
 class _ReversibleHalfResidualSwapFn(torch.autograd.Function):
